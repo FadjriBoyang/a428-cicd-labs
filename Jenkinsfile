@@ -1,37 +1,20 @@
-node {
-    def dockerContainer
-
-    try {
-        def dockerImage = docker.image('node:16-buster-slim')
-        
-        // Start the Docker container and assign it to the dockerContainer variable
-        dockerContainer = dockerImage.run('-p 3000:3000')
-
+pipeline {
+    agent {
+        docker {
+            image 'node:16-buster-slim'
+            args '-p 3000:3000'
+        }
+    }
+    stages {
         stage('Build') {
             steps {
-                script {
-                    // Run npm install inside the Docker container
-                    dockerContainer.inside {
-                        sh 'npm install'
-                    }
-                }
+                sh 'npm install'
             }
         }
-
-        stage('Test') {
+        stage('Test') { 
             steps {
-                script {
-                    // Run test.sh inside the Docker container
-                    dockerContainer.inside {
-                        sh './jenkins/scripts/test.sh'
-                    }
-                }
+                sh './jenkins/scripts/test.sh' 
             }
-        }
-    } finally {
-        // Clean up the Docker container
-        if (dockerContainer != null) {
-            dockerContainer.stop()
         }
     }
 }
