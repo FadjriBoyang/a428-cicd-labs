@@ -1,21 +1,28 @@
 node {
-    docker.image('node:16-buster-slim').args('-p 3000:3000'). inside {
+    try {
+        def dockerImage = docker.image('node:16-buster-slim')
+        def dockerContainer = dockerImage.run('-p 3000:3000')
+        
         stage('Build') {
             steps {
-                sh 'npm install'
+                script {
+                    dockerContainer.inside {
+                        sh 'npm install'
+                    }
+                }
             }
         }
+        
         stage('Test') {
             steps {
-                sh './jenkins/scripts/test.sh'
+                script {
+                    dockerContainer.inside {
+                        sh './jenkins/scripts/test.sh'
+                    }
+                }
             }
         }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-                input message: 'Finished using the website? (Click "Proceed" to continue)'
-                sh './jenkins/scripts/kill.sh'
-            }
-        }
+    } finally {
+        dockerContainer.stop()
     }
 }
