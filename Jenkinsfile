@@ -1,8 +1,9 @@
 node {
+    def dockerContainer
+
     try {
         def dockerImage = docker.image('node:16-buster-slim')
-        def dockerContainer
-
+        
         // Start the Docker container and assign it to the dockerContainer variable
         dockerContainer = dockerImage.run('-p 3000:3000')
 
