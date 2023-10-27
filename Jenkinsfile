@@ -4,5 +4,10 @@ node {
         args '-p 3000:3000'
     }
 
-    sh 'npm install && ./jenkins/scripts/test.sh'
+    stage('build'){
+        sh 'npm install'
+    }
+    stage('test') {
+         sh './jenkins/scripts/test.sh'
+    }
 }
